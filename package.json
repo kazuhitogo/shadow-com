@@ -1,6 +1,6 @@
 {
   "name": "shadow-com",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Air-gap file transfer via AV I/O",
   "main": "out/main/index.js",
   "scripts": {
