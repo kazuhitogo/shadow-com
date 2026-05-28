@@ -276,6 +276,7 @@ let hdmiFps = 30
 let hdmiWinOpen = false
 let _hdmiOpening = false
 
+const hdmiRefreshDisplaysBtn = document.getElementById('hdmi-refresh-displays-btn')
 const hdmiDisplaySel = document.getElementById('hdmi-display-sel')
 const hdmiPxSlider = document.getElementById('hdmi-px-slider')
 const hdmiPxVal = document.getElementById('hdmi-px-val')
@@ -302,6 +303,10 @@ function displaySortRank(label) {
 async function openAndCalibrate() {
   if (_hdmiOpening) return
   _hdmiOpening = true
+  hdmiRefreshDisplaysBtn.disabled = true
+  hdmiDisplaySel.disabled = true
+  hdmiPxSlider.disabled = true
+  hdmiFpsSlider.disabled = true
   try {
     const displayId = Number(hdmiDisplaySel.value) || undefined
     if (!displayId) return
@@ -312,31 +317,45 @@ async function openAndCalibrate() {
     }
     await window.electronAPI.hdmi.openWindow(displayId)
     hdmiWinOpen = true
-    if (hdmiFileData) hdmiStartBtn.disabled = false
+    if (hdmiFileData) {
+      hdmiStartBtn.disabled = false
+      hdmiRetransmitBtn.disabled = false
+    }
     await new Promise((r) => setTimeout(r, 800))
     await window.electronAPI.hdmi.sendFrame({ type: 'calibrate', pixelSize: hdmiPixelSize })
     drawCalibrationFrame(hdmiPreviewCanvas, hdmiPixelSize)
     hdmiFrameStat.textContent = 'キャリブレーションフレーム表示中'
   } finally {
     _hdmiOpening = false
+    hdmiRefreshDisplaysBtn.disabled = false
+    hdmiDisplaySel.disabled = false
+    hdmiPxSlider.disabled = false
+    hdmiFpsSlider.disabled = false
   }
 }
 
 async function refreshDisplayList() {
-  const prevId = hdmiDisplaySel.value
-  const displays = await window.electronAPI.hdmi.getDisplays()
-  console.log('[DBG-HDMI] getAllDisplays:', JSON.stringify(displays))
-  const filtered = displays.filter((d) => !d.internal)
-  filtered.sort((a, b) => displaySortRank(a.label) - displaySortRank(b.label))
-  hdmiDisplaySel.innerHTML = filtered.map((d) =>
-    `<option value="${d.id}">${d.label}</option>`
-  ).join('')
-  if (filtered.some((d) => String(d.id) === prevId)) {
-    hdmiDisplaySel.value = prevId
-  }
-  updateCapacityStat()
-  if (hdmiDisplaySel.value && !hdmiWinOpen) {
-    await openAndCalibrate()
+  hdmiRefreshDisplaysBtn.disabled = true
+  hdmiDisplaySel.disabled = true
+  try {
+    const prevId = hdmiDisplaySel.value
+    const displays = await window.electronAPI.hdmi.getDisplays()
+    console.log('[DBG-HDMI] getAllDisplays:', JSON.stringify(displays))
+    const filtered = displays.filter((d) => !d.internal)
+    filtered.sort((a, b) => displaySortRank(a.label) - displaySortRank(b.label))
+    hdmiDisplaySel.innerHTML = filtered.map((d) =>
+      `<option value="${d.id}">${d.label}</option>`
+    ).join('')
+    if (filtered.some((d) => String(d.id) === prevId)) {
+      hdmiDisplaySel.value = prevId
+    }
+    updateCapacityStat()
+    if (hdmiDisplaySel.value && !hdmiWinOpen) {
+      await openAndCalibrate()
+    }
+  } finally {
+    hdmiRefreshDisplaysBtn.disabled = false
+    hdmiDisplaySel.disabled = false
   }
 }
 
@@ -349,6 +368,7 @@ hdmiDisplaySel.addEventListener('change', openAndCalibrate)
 window.electronAPI.onHdmiWinClosed(() => {
   hdmiWinOpen = false
   hdmiStartBtn.disabled = true
+  hdmiRetransmitBtn.disabled = true
   hdmiSending = false
 })
 
@@ -388,6 +408,12 @@ hdmiStartBtn.addEventListener('click', async () => {
   hdmiSending = true
   hdmiStartBtn.disabled = true
   hdmiStopBtn.disabled = false
+  hdmiSelectBtn.disabled = true
+  hdmiPxSlider.disabled = true
+  hdmiFpsSlider.disabled = true
+  hdmiDisplaySel.disabled = true
+  hdmiRefreshDisplaysBtn.disabled = true
+  hdmiRetransmitBtn.disabled = true
 
   const P = hdmiPixelSize
   const chunks = splitData(hdmiFileData, P)
@@ -432,6 +458,12 @@ hdmiStartBtn.addEventListener('click', async () => {
   hdmiSending = false
   hdmiStartBtn.disabled = false
   hdmiStopBtn.disabled = true
+  hdmiSelectBtn.disabled = false
+  hdmiPxSlider.disabled = false
+  hdmiFpsSlider.disabled = false
+  hdmiDisplaySel.disabled = false
+  hdmiRefreshDisplaysBtn.disabled = false
+  hdmiRetransmitBtn.disabled = false
 })
 
 hdmiStopBtn.addEventListener('click', async () => {
@@ -439,6 +471,12 @@ hdmiStopBtn.addEventListener('click', async () => {
   await window.electronAPI.hdmi.sendFrame({ type: 'blank' })
   hdmiStartBtn.disabled = false
   hdmiStopBtn.disabled = true
+  hdmiSelectBtn.disabled = false
+  hdmiPxSlider.disabled = false
+  hdmiFpsSlider.disabled = false
+  hdmiDisplaySel.disabled = false
+  hdmiRefreshDisplaysBtn.disabled = false
+  hdmiRetransmitBtn.disabled = false
   hdmiSendStat.textContent = '停止'
 })
 
@@ -459,6 +497,11 @@ hdmiRetransmitBtn.addEventListener('click', async () => {
   hdmiStartBtn.disabled = true
   hdmiRetransmitBtn.disabled = true
   hdmiStopBtn.disabled = false
+  hdmiSelectBtn.disabled = true
+  hdmiPxSlider.disabled = true
+  hdmiFpsSlider.disabled = true
+  hdmiDisplaySel.disabled = true
+  hdmiRefreshDisplaysBtn.disabled = true
   const frameInterval = Math.round(1000 / hdmiFps)
 
   for (let pos = 0; pos < indices.length && hdmiSending; pos++) {
@@ -476,6 +519,11 @@ hdmiRetransmitBtn.addEventListener('click', async () => {
   hdmiStartBtn.disabled = false
   hdmiRetransmitBtn.disabled = false
   hdmiStopBtn.disabled = true
+  hdmiSelectBtn.disabled = false
+  hdmiPxSlider.disabled = false
+  hdmiFpsSlider.disabled = false
+  hdmiDisplaySel.disabled = false
+  hdmiRefreshDisplaysBtn.disabled = false
 })
 
 // ─── Mode 4 Receive (HDMI) ────────────────────────────────────────────────────
@@ -556,6 +604,8 @@ hdmiRecvStartBtn.addEventListener('click', async () => {
   hdmiRecvStat.textContent = 'カメラ起動中...'
   hdmiRecvStartBtn.disabled = true
   hdmiRecvStopBtn.disabled = false
+  hdmiCapSel.disabled = true
+  hdmiRecvPx.disabled = true
 
   try {
     const deviceId = hdmiCapSel.value || undefined
@@ -603,6 +653,8 @@ hdmiRecvStartBtn.addEventListener('click', async () => {
         hdmiRecvSaveBtn.disabled = false
         hdmiRecvStopBtn.disabled = true
         hdmiRecvStartBtn.disabled = false
+        hdmiCapSel.disabled = false
+        hdmiRecvPx.disabled = false
         hdmiRecvBar.style.width = '100%'
       },
     })
@@ -611,6 +663,8 @@ hdmiRecvStartBtn.addEventListener('click', async () => {
     hdmiRecvStat.textContent = `エラー: ${e.message}`
     hdmiRecvStartBtn.disabled = false
     hdmiRecvStopBtn.disabled = true
+    hdmiCapSel.disabled = false
+    hdmiRecvPx.disabled = false
   }
 })
 
@@ -632,6 +686,8 @@ hdmiRecvStopBtn.addEventListener('click', async () => {
   }
   hdmiRecvStartBtn.disabled = false
   hdmiRecvStopBtn.disabled = true
+  hdmiCapSel.disabled = false
+  hdmiRecvPx.disabled = false
   await saveHdmiDebugLog()
 })
 

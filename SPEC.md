@@ -161,6 +161,13 @@ maxPayload: 60                      // bytes/packet
 4. ファイル選択
 5. 送信開始
 
+**HDMI送信 ボタン状態管理**:
+- ディスプレイ探索中 (`refreshDisplayList`): `外部出力先を探す` + `ディスプレイ選択` → disabled
+- ウィンドウ開く中 (`openAndCalibrate`): `外部出力先を探す` + `ディスプレイ選択` + `Px` + `FPS` → disabled
+- 送信中/再送中: `ファイル選択` + `Px` + `FPS` + `ディスプレイ選択` + `外部出力先を探す` + `再送開始` → disabled
+- ウィンドウ消滅 (`onHdmiWinClosed`): `送信開始` + `再送開始` → disabled
+- ウィンドウ再開後にファイルあり: `送信開始` + `再送開始` → enabled
+
 **HDMI受信 UIフロー**:
 1. キャプチャデバイス選択
    - ラベルに "Capture"/"USB Video"/"UVC"/"UGREEN"/"AV" を含むものを先頭 (カメラは後ろ)
@@ -171,6 +178,10 @@ maxPayload: 60                      // bytes/packet
 6. ファイル保存
 7. 停止
 - LIVE CAPTURE 動画: `min-height: 40vh`
+
+**HDMI受信 ボタン状態管理**:
+- 受信中 (カメラ起動〜完了/停止まで): `デバイス選択` + `Px` → disabled
+- 完了/停止後: `デバイス選択` + `Px` → enabled
 
 ---
 
