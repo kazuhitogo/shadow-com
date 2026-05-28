@@ -36,7 +36,7 @@ Wi-Fi/Bluetooth/インターネット不使用。PCのAV入出力（音・光・
 [seq:2B][total:2B][crc16:2B][payload:NB][rs_parity:16B]
 ```
 - RS(255,239) — 最大8バイトエラー訂正
-- 最大ペイロード: 217 bytes
+- 最大ペイロード: 233 bytes (255 - NROOTS(16) - HEADER(6) = 233)
 
 ---
 
