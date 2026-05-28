@@ -73,7 +73,7 @@ maxPayload: 20                      // bytes/packet
 ### AUX — 3.5mmステレオミニケーブル直結音波
 
 **インターフェース**: イヤホンジャック(出力) → マイク端子(入力) ケーブル直結  
-**目標速度**: ~67 bps (symbolDuration=30ms)
+**目標速度**: ~128 bps (symbolDuration=30ms、maxPayload=233B)
 **ユースケース**: 数KBのファイル
 
 **送信 (変調)**:
@@ -96,7 +96,7 @@ baseFreq: 6000, freqSpacing: 300   // 6000〜10500 Hz
 symbolDuration: 30                  // ms
 preambleFreq: 11000, preambleDuration: 200, silenceGap: 10
 fftSize: 1024, threshold: -45
-maxPayload: 60                      // bytes/packet
+maxPayload: 233                     // bytes/packet (RS上限: MAX_DATA-HEADER_SIZE=239-6=233)
 ```
 
 ---
@@ -138,7 +138,7 @@ maxPayload: 60                      // bytes/packet
 ### 5.1 速度目標
 
 - Air: ~30 bps (テキスト、数十バイト)
-- AUX: ~67 bps (数KB)
+- AUX: ~128 bps (数KB、maxPayload=233B)
 - HDMI: ~1.9 MB/s (P=2, 30fps) 〜 ~9.7 KB/s (P=16, 10fps)
 
 ### 5.2 セキュリティ・隔離性

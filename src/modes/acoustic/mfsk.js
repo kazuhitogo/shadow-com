@@ -29,7 +29,7 @@ export const MODES = {
     silenceGap: 10,
     fftSize: 1024,        // ~21 ms window @ 48 kHz (must be < symbolDuration=30ms to avoid ISI)
     threshold: -45,
-    maxPayload: 60,
+    maxPayload: 233,
   },
 }
 

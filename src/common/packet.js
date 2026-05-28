@@ -4,7 +4,7 @@ import { encode as rsEncode, decode as rsDecode, NROOTS, MAX_DATA } from './rs-c
 const HEADER_SIZE = 6
 
 // Max payload so that header+payload+NROOTS <= 255 (GF(2^8) limit)
-export const DEFAULT_PAYLOAD_SIZE = MAX_DATA - HEADER_SIZE  // 217 bytes
+export const DEFAULT_PAYLOAD_SIZE = MAX_DATA - HEADER_SIZE  // 233 bytes
 
 function crc16(data) {
   let crc = 0xffff

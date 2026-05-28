@@ -120,7 +120,7 @@ Phase 1〜5 完了。Phase 6 (次の改善候補) 検討中。
 
 ## Phase 10: 次の改善候補
 
-- [ ] AUX: maxPayload拡大 (現在60B → 120〜240B)
+- [x] AUX: maxPayload拡大 (60B → 233B、RS上限MAX_DATA-HEADER=239-6=233)
 - [ ] Air/AUX: FEC — MFSKシンボル列にReed-Solomon追加
 - [ ] HDMI: FPS実測値の表示 (送信・受信それぞれ)
 - [ ] HDMI: 転送完了後の自動ファイル保存
