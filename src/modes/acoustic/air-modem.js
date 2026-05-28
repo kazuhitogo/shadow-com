@@ -171,11 +171,12 @@ export class AirModem {
   }
 
   stopReceive() {
-    if (this._dbg && this._rxState) {
+    if (this._dbg && this._rxState && this._dbg.meta) {
       this._dbg.meta.maxPreamblePower = this._rxState.maxPreamblePower
       this._dbg.meta.threshold = this._cfg?.threshold
     }
     this._state = 'idle'
+    this._rxState = null
     if (this._workletNode) { this._workletNode.disconnect(); this._workletNode = null }
     if (this._stream) { this._stream.getTracks().forEach((t) => t.stop()); this._stream = null }
     this._onStatus?.('IDLE', '')
@@ -212,6 +213,11 @@ export class AirModem {
         rx.lastSymIdx = -1
         rx.phase = 'sync'
         this._onStatus?.('SYNC', cfg.label)
+        if (this._dbg) {
+          this._dbg.fftSnapshots.push({
+            phase: 'preamble_end', audioTime: now, preamblePower,
+          })
+        }
       }
     } else if (rx.phase === 'sync') {
       let bestPower = -Infinity
