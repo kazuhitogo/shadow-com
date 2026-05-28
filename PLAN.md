@@ -109,7 +109,16 @@ Phase 1〜5 完了。Phase 6 (次の改善候補) 検討中。
   - header `payload_len` uint24 は将来拡張のため維持
 - [ ] (将来案) luma 多値 (グレースケール N値) でクロマ非依存の高速化
 
-## Phase 9: 次の改善候補
+## Phase 9: HDMI UIボタン状態管理
+
+- [x] 送信: `refreshDisplayList`中に `外部出力先を探す` + `ディスプレイ選択` を disabled
+- [x] 送信: `openAndCalibrate`中に `外部出力先を探す` + `ディスプレイ選択` + `Px` + `FPS` を disabled
+- [x] 送信: 送信中/再送中に `ファイル選択` + `Px` + `FPS` + `ディスプレイ選択` + `外部出力先を探す` + `再送開始` を disabled
+- [x] 送信: `onHdmiWinClosed`で `再送開始` も disabled
+- [x] 送信: ウィンドウ再開後にファイルあれば `再送開始` を enabled に戻す
+- [x] 受信: 受信中に `デバイス選択` + `Px` を disabled、完了/停止/エラー時に enabled に戻す
+
+## Phase 10: 次の改善候補
 
 - [ ] AUX: maxPayload拡大 (現在60B → 120〜240B)
 - [ ] Air/AUX: FEC — MFSKシンボル列にReed-Solomon追加
