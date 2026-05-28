@@ -164,6 +164,7 @@ export class AirModem {
       symbols: [],
       lastSymIdx: -1,
       maxPreamblePower: -Infinity,
+      syncFirstDetect: null,
     }
 
     this._state = 'receiving'
@@ -226,16 +227,22 @@ export class AirModem {
         if (bin < freqData.length && freqData[bin] > bestPower) bestPower = freqData[bin]
       }
       if (bestPower > cfg.threshold) {
-        rx.symbolStart = now
-        rx.phase = 'data'
-        this._onStatus?.('RECEIVING', cfg.label)
-        if (this._dbg) {
-          const maxBin = Math.ceil(cfg.preambleFreq * 1.2 / bHz)
-          this._dbg.fftSnapshots.push({
-            phase: 'data_start', audioTime: now,
-            fft: Array.from(freqData.subarray(0, maxBin)).map(v => Math.round(v * 10) / 10),
-          })
+        if (!rx.syncFirstDetect) rx.syncFirstDetect = now
+        // symbolDuration の半分以上連続して threshold を超えたら本物のデータとみなす
+        if (now - rx.syncFirstDetect >= cfg.symbolDuration / 1000 * 0.5) {
+          rx.symbolStart = rx.syncFirstDetect
+          rx.phase = 'data'
+          this._onStatus?.('RECEIVING', cfg.label)
+          if (this._dbg) {
+            const maxBin = Math.ceil(cfg.preambleFreq * 1.2 / bHz)
+            this._dbg.fftSnapshots.push({
+              phase: 'data_start', audioTime: now,
+              fft: Array.from(freqData.subarray(0, maxBin)).map(v => Math.round(v * 10) / 10),
+            })
+          }
         }
+      } else {
+        rx.syncFirstDetect = null
       }
     } else if (rx.phase === 'data') {
       const elapsed = now - rx.symbolStart
