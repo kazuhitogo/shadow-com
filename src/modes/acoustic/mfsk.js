@@ -9,7 +9,7 @@ export const MODES = {
     baseFreq: 10000,
     freqSpacing: 500,     // data tones: 10000, 10500, ..., 13500 Hz
     symbolDuration: 100,  // ms per symbol
-    preambleFreq: 15000,  // Hz – above data range
+    preambleFreq: 9000,   // Hz – below data range (15000Hz は内蔵スピーカー/マイクで感度低く不安定)
     preambleDuration: 400,
     silenceGap: 20,       // ms gap after preamble before data
     fftSize: 2048,        // ~43 ms window @ 48 kHz

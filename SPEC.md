@@ -63,8 +63,8 @@ Wi-Fi/Bluetooth/インターネット不使用。PCのAV入出力（音・光・
 tones: 8, bitsPerSymbol: 3
 baseFreq: 10000, freqSpacing: 500  // 10000〜13500 Hz
 symbolDuration: 100                 // ms
-preambleFreq: 15000, preambleDuration: 400, silenceGap: 20
-fftSize: 2048, threshold: -65      // ~43ms窓。Air実測プリアンブル-55dBFS → 有線-45より低め
+preambleFreq: 9000, preambleDuration: 400, silenceGap: 20  // 9kHz: データ帯域下側、内蔵スピーカー/マイク感度良好
+fftSize: 2048, threshold: -65      // ~43ms窓
 maxPayload: 20                      // bytes/packet
 ```
 
