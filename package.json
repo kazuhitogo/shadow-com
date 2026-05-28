@@ -1,0 +1,39 @@
+{
+  "name": "shadow-com",
+  "version": "0.1.0",
+  "description": "Air-gap file transfer via AV I/O",
+  "main": "out/main/index.js",
+  "scripts": {
+    "dev": "electron-vite dev",
+    "build": "electron-vite build",
+    "package": "electron-vite build && electron-builder",
+    "test": "vitest run",
+    "postinstall": "node node_modules/electron/install.js"
+  },
+  "devDependencies": {
+    "electron": "^42.2.0",
+    "electron-builder": "^26.8.1",
+    "electron-vite": "^5.0.0",
+    "eslint": "^9.17.0",
+    "prettier": "^3.4.2",
+    "vite": "^7.3.3",
+    "vitest": "^4.1.7"
+  },
+  "dependencies": {},
+  "build": {
+    "appId": "com.shadowcom.app",
+    "productName": "Shadow Com",
+    "files": [
+      "out/**/*"
+    ],
+    "mac": {
+      "target": "dmg"
+    },
+    "win": {
+      "target": "nsis"
+    },
+    "linux": {
+      "target": "AppImage"
+    }
+  }
+}

@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shadow Com</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <header>
+    <h1>SHADOW COM</h1>
+    <span class="badge">AIR-GAP</span>
+  </header>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="air-send">Air — 送信</button>
+    <button class="tab-btn" data-tab="air-recv">Air — 受信</button>
+    <button class="tab-btn" data-tab="aux-send">AUX — 送信</button>
+    <button class="tab-btn" data-tab="aux-recv">AUX — 受信</button>
+    <button class="tab-btn" data-tab="hdmi-send">HDMI — 送信</button>
+    <button class="tab-btn" data-tab="hdmi-recv">HDMI — 受信</button>
+  </div>
+
+  <!-- Air 送信タブ -->
+  <div id="air-send-tab" class="tab-content active">
+    <div class="panel">
+      <div class="left">
+        <div class="card">
+          <h2>MODE</h2>
+          <div class="stat">Air: 8-FSK · 100ms/sym · ~30 bps · 15-22 kHz</div>
+          <div class="stat" style="margin-top:4px;opacity:0.7">スピーカー → マイク (同室 1m以内)</div>
+        </div>
+
+        <div class="card">
+          <h2>FILE</h2>
+          <button class="primary" id="ac-select-btn">ファイル選択</button>
+          <div class="file-info" id="ac-file-info">未選択</div>
+        </div>
+
+        <div class="card">
+          <h2>PROGRESS</h2>
+          <div class="progress-bar-wrap">
+            <div class="progress-bar" id="ac-send-bar"></div>
+          </div>
+          <div class="stat" id="ac-send-stat">待機中</div>
+        </div>
+
+        <button class="primary" id="ac-send-btn" disabled>送信開始</button>
+        <button class="secondary" id="ac-stop-btn" disabled style="margin-top:8px">停止</button>
+      </div>
+
+      <div class="right card">
+        <h2>WAVEFORM MONITOR</h2>
+        <canvas id="ac-wave-canvas" width="500" height="200" style="width:100%;background:#000;border-radius:4px"></canvas>
+        <div class="stat" style="margin-top:8px" id="ac-freq-stat">—</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AUX 送信タブ -->
+  <div id="aux-send-tab" class="tab-content">
+    <div class="panel">
+      <div class="left">
+        <div class="card">
+          <h2>MODE</h2>
+          <div class="stat">AUX: 16-FSK · 30ms/sym · ~130 bps · 6-11 kHz</div>
+          <div class="stat" style="margin-top:4px;opacity:0.7">3.5mm ケーブル直結: OUT(イヤホン) → IN(マイク)</div>
+        </div>
+
+        <div class="card">
+          <h2>FILE</h2>
+          <button class="primary" id="axs-select-btn">ファイル選択</button>
+          <div class="file-info" id="axs-file-info">未選択</div>
+        </div>
+
+        <div class="card">
+          <h2>PROGRESS</h2>
+          <div class="progress-bar-wrap">
+            <div class="progress-bar" id="axs-send-bar"></div>
+          </div>
+          <div class="stat" id="axs-send-stat">待機中</div>
+        </div>
+
+        <button class="primary" id="axs-send-btn" disabled>送信開始</button>
+        <button class="secondary" id="axs-stop-btn" disabled style="margin-top:8px">停止</button>
+      </div>
+
+      <div class="right card">
+        <h2>WAVEFORM MONITOR</h2>
+        <canvas id="axs-wave-canvas" width="500" height="200" style="width:100%;background:#000;border-radius:4px"></canvas>
+        <div class="stat" style="margin-top:8px" id="axs-freq-stat">—</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Air 受信タブ -->
+  <div id="air-recv-tab" class="tab-content">
+    <div class="panel">
+      <div class="left">
+        <div class="card">
+          <h2>MODE</h2>
+          <div class="stat">Air: 8-FSK · 100ms/sym · ~30 bps · 15-22 kHz</div>
+        </div>
+
+        <div class="card">
+          <h2>STATUS</h2>
+          <span class="status-badge idle" id="ar-status">IDLE</span>
+          <div class="stat" style="margin-top:8px" id="ar-stat">待機中</div>
+        </div>
+
+        <div class="card">
+          <h2>RECEIVED PACKETS</h2>
+          <div class="packet-grid" id="ar-packet-grid"></div>
+          <div class="stat" id="ar-progress-stat">0 / 0</div>
+        </div>
+
+        <button class="primary" id="ar-start-btn">受信開始</button>
+        <button class="secondary" id="ar-stop-btn" disabled style="margin-top:8px">停止</button>
+        <button class="primary" id="ar-save-btn" disabled style="margin-top:8px;background:var(--success);color:#000">ファイル保存</button>
+      </div>
+
+      <div class="right card">
+        <h2>FFT SPECTRUM</h2>
+        <canvas id="ar-fft-canvas" width="500" height="200" style="width:100%;background:#000;border-radius:4px"></canvas>
+        <div class="stat" style="margin-top:8px" id="ar-freq-stat">—</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AUX 受信タブ -->
+  <div id="aux-recv-tab" class="tab-content">
+    <div class="panel">
+      <div class="left">
+        <div class="card">
+          <h2>MODE</h2>
+          <div class="stat">AUX: 16-FSK · 30ms/sym · ~130 bps · 6-11 kHz</div>
+          <div class="stat" style="margin-top:4px;opacity:0.7">3.5mm ケーブル直結: OUT(イヤホン) → IN(マイク)</div>
+        </div>
+
+        <div class="card">
+          <h2>AUDIO INPUT DEVICE</h2>
+          <select id="axr-device-sel" style="width:100%;padding:6px;background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:4px;font-family:inherit;font-size:12px">
+            <option value="">デバイスを選択...</option>
+          </select>
+        </div>
+
+        <div class="card">
+          <h2>STATUS</h2>
+          <span class="status-badge idle" id="axr-status">IDLE</span>
+          <div class="stat" style="margin-top:8px" id="axr-stat">待機中</div>
+        </div>
+
+        <div class="card">
+          <h2>RECEIVED PACKETS</h2>
+          <div class="packet-grid" id="axr-packet-grid"></div>
+          <div class="stat" id="axr-progress-stat">0 / 0</div>
+        </div>
+
+        <button class="primary" id="axr-start-btn">受信開始</button>
+        <button class="secondary" id="axr-stop-btn" disabled style="margin-top:8px">停止</button>
+        <button class="primary" id="axr-save-btn" disabled style="margin-top:8px;background:var(--success);color:#000">ファイル保存</button>
+      </div>
+
+      <div class="right card">
+        <h2>FFT SPECTRUM</h2>
+        <canvas id="axr-fft-canvas" width="500" height="200" style="width:100%;background:#000;border-radius:4px"></canvas>
+        <div class="stat" style="margin-top:8px" id="axr-freq-stat">—</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mode 4 送信タブ -->
+  <div id="hdmi-send-tab" class="tab-content">
+    <div class="panel">
+      <div class="left">
+        <div class="card">
+          <h2>DISPLAY</h2>
+          <button class="secondary" id="hdmi-refresh-displays-btn">外部出力先を探す</button>
+          <select id="hdmi-display-sel" style="width:100%;padding:6px;background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:4px;font-family:inherit;font-size:12px;margin-top:6px">
+            <option value="">ディスプレイを選択...</option>
+          </select>
+        </div>
+
+        <div class="card">
+          <h2>PIXEL SIZE</h2>
+          <div class="slider-row">
+            <label>Px</label>
+            <input type="range" id="hdmi-px-slider" min="2" max="20" step="1" value="2" />
+            <span id="hdmi-px-val">2×2</span>
+          </div>
+          <div class="slider-row">
+            <label>FPS</label>
+            <input type="range" id="hdmi-fps-slider" min="1" max="30" step="1" value="30" />
+            <span id="hdmi-fps-val">30 fps</span>
+          </div>
+          <div class="stat" id="hdmi-capacity-stat">—</div>
+        </div>
+
+        <div class="card">
+          <h2>FILE</h2>
+          <button class="primary" id="hdmi-select-btn">ファイル選択</button>
+          <div class="file-info" id="hdmi-file-info">未選択</div>
+        </div>
+
+        <div class="card">
+          <h2>PROGRESS</h2>
+          <div class="progress-bar-wrap">
+            <div class="progress-bar" id="hdmi-send-bar"></div>
+          </div>
+          <div class="stat" id="hdmi-send-stat">待機中</div>
+        </div>
+
+        <button class="primary" id="hdmi-start-btn" disabled>送信開始</button>
+        <button class="secondary" id="hdmi-stop-btn" disabled style="margin-top:6px">停止</button>
+
+        <div class="card" style="margin-top:12px">
+          <h2>再送 (欠損フレーム)</h2>
+          <input type="text" id="hdmi-retransmit-input"
+            style="width:100%;box-sizing:border-box;padding:4px 6px;background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:4px;font-family:monospace;font-size:11px"
+            placeholder="例: 3,7,15,42" />
+          <button class="primary" id="hdmi-retransmit-btn" disabled style="margin-top:6px">再送開始</button>
+        </div>
+      </div>
+
+      <div class="right card">
+        <h2>FRAME PREVIEW</h2>
+        <canvas id="hdmi-preview-canvas" style="width:100%;background:#000;border-radius:4px;aspect-ratio:16/9"></canvas>
+        <div class="stat" style="margin-top:8px" id="hdmi-frame-stat">—</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mode 4 受信タブ -->
+  <div id="hdmi-recv-tab" class="tab-content">
+    <div class="panel">
+      <div class="left">
+        <div class="card">
+          <h2>CAPTURE DEVICE</h2>
+          <select id="hdmi-cap-sel" style="width:100%;padding:6px;background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:4px;font-family:inherit;font-size:12px">
+            <option value="">デバイスを選択...</option>
+          </select>
+        </div>
+
+        <div class="card">
+          <h2>PIXEL SIZE</h2>
+          <div class="slider-row">
+            <label>Px</label>
+            <input type="range" id="hdmi-recv-px" min="2" max="20" step="1" value="2" />
+            <span id="hdmi-recv-px-val">2×2</span>
+          </div>
+        </div>
+
+        <button class="primary" id="hdmi-recv-start-btn">受信開始</button>
+
+        <div class="card" style="margin-top:12px">
+          <h2>STATUS</h2>
+          <span class="status-badge idle" id="hdmi-recv-status">IDLE</span>
+          <div class="stat" style="margin-top:8px" id="hdmi-recv-stat">待機中</div>
+          <div class="progress-bar-wrap" style="margin-top:8px">
+            <div class="progress-bar" id="hdmi-recv-bar"></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>RECEIVED FRAMES</h2>
+          <div class="packet-grid" id="hdmi-frame-grid"></div>
+          <div class="stat" id="hdmi-recv-progress">0 / 0</div>
+          <div style="margin-top:8px;font-size:11px;color:var(--text-muted)">欠損フレーム</div>
+          <textarea id="hdmi-missing-display" readonly rows="3"
+            style="width:100%;box-sizing:border-box;margin-top:4px;padding:4px 6px;background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:4px;font-family:monospace;font-size:11px;resize:none;overflow-y:auto"
+            placeholder="なし"></textarea>
+        </div>
+
+        <button class="primary" id="hdmi-recv-save-btn" disabled style="background:var(--success);color:#000">ファイル保存</button>
+        <button class="secondary" id="hdmi-recv-stop-btn" disabled style="margin-top:6px">停止</button>
+      </div>
+
+      <div class="right card">
+        <h2>LIVE CAPTURE</h2>
+        <div style="position:relative;width:100%;min-height:40vh;background:#000;border-radius:4px;overflow:hidden">
+          <video id="hdmi-cap-video" autoplay muted playsinline style="position:absolute;width:100%;height:100%;object-fit:contain"></video>
+          <canvas id="hdmi-scan-canvas" style="position:absolute;top:0;left:0;width:100%;height:100%;z-index:1"></canvas>
+        </div>
+        <div class="stat" style="margin-top:8px" id="hdmi-cap-stat">—</div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="./main.js"></script>
+</body>
+</html>
