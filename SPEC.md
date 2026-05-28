@@ -89,6 +89,11 @@ maxPayload: 20                      // bytes/packet
 - syncフェーズ: プリアンブル終了後、データ帯域の最初の信号でsymbolStart確定
 - `_lastFreqData` キャッシュ経由でFFT visualizerに提供
 
+**AUX受信 デバイス選択 既知の問題**:
+- デバイスリストはタブクリック時のみ更新 — ケーブル刺し後にタブ再クリックで手動更新が必要
+- `devicechange` イベント未監視 — ホットプラグで自動更新されない
+- 対策: `navigator.mediaDevices.addEventListener('devicechange', ...)` + 更新ボタン追加が必要
+
 **Mode 2 設定値 (`mfsk.js`)**:
 ```js
 tones: 16, bitsPerSymbol: 4
