@@ -11,7 +11,7 @@ export const MODES = {
     symbolDuration: 100,  // ms per symbol
     preambleFreq: 9000,   // Hz – below data range (15000Hz は内蔵スピーカー/マイクで感度低く不安定)
     preambleDuration: 400,
-    silenceGap: 20,       // ms gap after preamble before data
+    silenceGap: 100,      // ms gap after preamble before data (symbolDuration以上必要: syncフェーズがノイズをシンボル先頭と誤認しないよう)
     fftSize: 2048,        // ~43 ms window @ 48 kHz
     threshold: -65,       // dBFS detection threshold (Air実測-55dBFS、AUX有線-45より低め)
     maxPayload: 20,       // bytes per acoustic packet
