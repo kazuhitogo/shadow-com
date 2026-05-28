@@ -36,6 +36,32 @@ npm run package  # electron-builder パッケージング
 
 コード変更後は必ず `rm -rf out/ && npm run dev` でリビルド。
 
+## ブランチ戦略 (必須)
+
+- **`main` への直接コミット禁止**。新規開発・修正は必ずブランチを切る:
+  ```bash
+  git checkout -b feat/xxx   # 新機能
+  git checkout -b fix/xxx    # バグ修正
+  git checkout -b chore/xxx  # その他
+  ```
+- 動作確認後に PR を作成してマージ。試行錯誤コミットは squash で1つにまとめる。
+- `main` は常にビルド可能・リリース可能な状態を保つ。
+
+## リリース手順
+
+タグ push で GitHub Actions (`.github/workflows/release.yml`) が起動し、
+macOS DMG / Windows NSIS / Linux AppImage を自動ビルド → GitHub Release に
+アップロードする。
+
+```bash
+# package.json と package-lock.json の version を更新後:
+git tag -a v1.2.3 -m "Release v1.2.3"
+git push origin main
+git push origin v1.2.3
+```
+
+CI 進捗: `gh run list --workflow=release.yml --limit 3`
+
 ## 重要ファイル
 
 ```
